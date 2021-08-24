@@ -60,3 +60,64 @@ def display(recommendations, covers):
             </div>
         '''
     return html_display
+
+
+## ** Function added by Carl: Aug 23 ** 
+
+import pandas as pd
+from sklearn.neighbors import NearestNeighbors
+
+
+# Load CSV files
+# Embeddings
+emb_file = '../../data/embeddings_df_001.csv' # USE CORRECT PATH
+embeddings = pd.read_csv(emb_file)
+# Drop extra index column
+embeddings.drop('Unnamed: 0', axis=1, inplace=True)
+# Tracks
+track_file = '../../data/tracks.csv'
+tracks = pd.read_csv(track_file) # USE CORRECT PATH
+
+
+def find_neighbors(song):
+    '''
+    Find the nearest neighbors of a song
+    1. Checks for song
+    2. Loads and process the embeddings into an array
+    3. Trains a nearest neighbors model
+    4. Finds the 10 nearest neighbors of the given song
+    ARGUMENTS: song in string form
+    RETURNS: list of indices
+    '''
+    # 1. Check if song exists: if yes, use first result
+    songs = tracks.index[tracks.name == song]
+    if len(songs) <1:
+        return 'ERROR: Not a valid song name' 
+    else:
+        song_index = songs[0]
+
+    # 2. Prepare song embeddings data
+    # Convert dataframe to numpy array
+    encoded_songs = embeddings.to_numpy()
+
+    # 3. Train nearest neighbors model on encodings
+    # Number of neighbors
+    n = 11
+    nn = NearestNeighbors(n_neighbors=n, algorithm='ball_tree')
+    nn.fit(encoded_songs)
+
+    # 4. Get neigbors of song
+    test_encoding = encoded_songs[song_index].reshape(1,-1)
+    _, n_indices = nn.kneighbors(test_encoding)
+    # Prepare indices
+    n_indices = n_indices.tolist()[0]
+    # Remove search song if present
+    for i in n_indices:
+        if i == song_index:
+            index = n_indices.index(i)
+            n_indices.pop(index)
+    # Add search song index at beginning
+    n_indices.insert(0, song_index)
+
+    # FIRST INDEX IS SEARCH SONG!
+    return n_indices
