@@ -1,10 +1,11 @@
 """Spotify predicted playlist based on user inputs."""
-
 import os
+import pandas as pd
+import json
 import spotipy
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
-from spotipy.oauth2 import SpotifyClientCredentials
+from functions import get_recommendations, get_covers
 
 DB = SQLAlchemy()
 api = spotipy.Spotify()
@@ -26,45 +27,7 @@ class Spotify(DB.Model):
         return f"[ID: {self.id} | Genre: {self.genre} | Sub-Genre: {self.sub_genre} | Artist: {self.artist} | Album: {self.album} | Title: {self.title} | Tempo: {self.tempo} | Length: {self.length}]"
 
 
-def get_recommendations(search):
-    """Get 10 recommendations from a search."""
-    sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
-    # Search: return JSON of the first result
-    result = sp.search(q=search, type="track", limit=1)
-    # Get ID of the track. Need a list for the recommendation lookup
-    id_list = [result["tracks"]["items"][0]["id"]]
-    return sp.recommendations(seed_tracks=id_list, limit=10)
-
-
-def get_covers(recommendations):
-    """Get album covers for recommendations."""
-    sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
-    id_list = [track["id"] for track in recommendations["tracks"]]
-    tracks = sp.tracks(id_list)
-    cover_links = [image["album"]["images"][2]["url"] for image in tracks["tracks"]]
-    return cover_links
-
-
-def display(recommendations, covers):
-    html_display = ''
-    for idx, track in enumerate(recommendations['tracks']):
-        html_display += f'''
-            <div class = 'row recommendation'>
-                <div class = 'col-md-2'>
-                    <img src = "{covers[idx]}">
-                </div>
-                <div class = 'col-md-6 info'>
-                    <p>{track['name']} by {track['artists'][0]['name']}</p>
-                </div>
-                <div class = 'col-md-4'>
-                    <a href = "{track['external_urls']['spotify']}" target = '_blank'><button class = 'button'>Play It</button></a>
-                </div>
-            </div>
-        '''
-    return html_display
-
-
-def flask():
+def create_app():
     """Instantiate the Flask database."""
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///deep_spot.sqlite3"
@@ -75,3 +38,31 @@ def flask():
         """Base view."""
 
         return "Welcome to Deep Spot, a place to discover new music in Spotify which is similar to a song you choose."
+
+    @app.route('/reset')
+    def reset_db():
+        """Reset the database"""
+        DB.drop_all()
+        DB.create_all()
+        return 'Database refreshed'
+
+    @app.route('/data')
+    def data():
+        """Create a page view with all data from the original dataset"""
+        df = pd.read_csv('Modelling\\data\\tracks.csv')
+        result = df.to_json(orient="index")
+        parsed = json.loads(result)
+        return json.dumps(parsed, indent=4)
+
+    @app.route('/results')
+    def prediction_results():
+        """Results page view showing predictions"""
+        df = pd.read_csv('Modelling\\data\\tracks.csv')
+        id = df.sample()
+        return str(id)
+
+    return app
+
+
+if __name__ == '__main__':
+    create_app().run()
