@@ -3,9 +3,10 @@ import os
 import pandas as pd
 import json
 import spotipy
-from flask import Flask, request
+from flask import Flask, request, render_template, json, url_for
 from flask_sqlalchemy import SQLAlchemy
-from functions import get_recommendations, get_covers
+# from functions import get_recommendations, get_covers, find_neighbors
+
 
 DB = SQLAlchemy()
 api = spotipy.Spotify()
@@ -33,11 +34,11 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///deep_spot.sqlite3"
     DB.init_app(app)
 
-    @app.route("/")
+    @app.route("/", methods=['GET'])
     def base():
         """Base view."""
 
-        return "Welcome to Deep Spot, a place to discover new music in Spotify which is similar to a song you choose."
+        return render_template('deep_landing.html')
 
     @app.route('/reset')
     def reset_db():

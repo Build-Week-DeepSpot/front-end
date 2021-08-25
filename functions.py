@@ -26,6 +26,7 @@ class Spotify(DB.Model):
 
 def get_recommendations(search):
     """Get 10 recommendations from a search."""
+    # Init
     sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
     # Search: return JSON of the first result
     result = sp.search(q=search, type="track", limit=1)
