@@ -1,5 +1,5 @@
 # DeepSpot
-#### Autoencoded song recommender system
+#### Autoencoded Song Recommender System with Flask Backend
 ## ☝️ Proposal
 
 To delight and surprise our users with songs they haven’t heard before that share similarities to an input.
