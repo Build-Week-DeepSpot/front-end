@@ -1,3 +1,4 @@
-/Modelling/saved_models/embeddings_df_001.csv
-/Modelling/saved_models/nearestneighbours_001.sav.zip
-/Modelling/Data/tracks.csv.zip
+.env
+.flaskenv
+venv/
+__pycache__/

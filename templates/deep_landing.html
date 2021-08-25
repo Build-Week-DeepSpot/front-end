@@ -1,0 +1,28 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+  {{ title }}DEEP SPOT{% endblock %}
+
+{% block styles %}
+  {{ super() }}
+  <link rel = 'stylesheet' href = "{{ url_for('static', filename = 'deep_visual.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class = 'container-fluid'>
+  <div class = 'row slogan'>
+    <h1>Get more of that one song you love</h1>
+  </div>
+</div>
+<div class = 'container'>
+  <div class = 'row'>
+      <div class = 'col-md'>
+        {{ wtf.quick_form(form) }}
+      </div>
+  </div>
+  {% if html_code %}
+    {{ html_code|safe}}
+  {% endif %}
+</div>
+{% endblock %}
