@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import json
 import spotipy
-from flask import Flask, request, render_template, json, url_for
+from flask import Flask, request, render_template, json, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 # from functions import get_recommendations, get_covers, find_neighbors
 
