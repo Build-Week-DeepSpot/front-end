@@ -5,7 +5,7 @@ import json
 import spotipy
 from flask import Flask, request, render_template, json, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
-# from functions import get_recommendations, get_covers, find_neighbors
+from functions import get_recommendations, get_covers, find_neighbors
 
 
 DB = SQLAlchemy()
@@ -34,33 +34,35 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///deep_spot.sqlite3"
     DB.init_app(app)
 
-    @app.route("/", methods=['GET'])
+    @app.route("/", methods=['GET', 'POST'])
     def base():
-        """Base view."""
+        """Base view. Asks user to input track to get recommendations"""
+        if request.method == 'POST':
+            return results(search)
 
         return render_template('deep_landing.html')
+
 
     @app.route('/reset')
     def reset_db():
         """Reset the database"""
         DB.drop_all()
         DB.create_all()
-        return 'Database refreshed'
+        return render_template('deep_reset.html')
 
-    @app.route('/data')
+    @app.route('/data', methods=['GET', 'POST'])
     def data():
         """Create a page view with all data from the original dataset"""
-        df = pd.read_csv('Modelling\\data\\tracks.csv')
+        df = pd.read_csv('\\Modelling\\Data\\new_songs_cleaned.csv')
         result = df.to_json(orient="index")
         parsed = json.loads(result)
         return json.dumps(parsed, indent=4)
 
-    @app.route('/results')
+    @app.route('/results', methods=['GET', 'POST'])
     def prediction_results():
         """Results page view showing predictions"""
-        df = pd.read_csv('Modelling\\data\\tracks.csv')
-        id = df.sample()
-        return str(id)
+        results = find_neighbors(prediction_results)
+        return results
 
     return app
 
