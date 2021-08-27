@@ -1,0 +1,13 @@
+{% extends "bootstrap/base.html" %}
+
+
+{% block content %}
+    <a><img src="https://m.media-amazon.com/images/I/71qtbonIc3L._SS500_.jpg"></a>
+    <h3>{% block title %} If you like <a href="{{ input_track['url'] }}">{{ input_track['name'] }}</a> by {{ input_track['artists'] }} you might also like: {% endblock %}</h3>
+    <!-- <a><img src="{{ input_track['album_cover'] }}"></a> -->
+    <hr>
+    <!-- {% for item in output_tracks %}
+        <h4><a href="{{ item['url'] }}">{{ item['name'] }}</a> by {{ item['artists'] }}</h4>
+        <a><img src="{{ item['album_cover_url'] }}"></a>
+    {% endfor %} -->
+{% endblock %}
