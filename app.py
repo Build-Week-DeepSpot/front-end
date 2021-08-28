@@ -5,7 +5,7 @@ import json
 import spotipy
 from flask import Flask, request, render_template, json, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
-from functions import get_recommendations, get_covers, find_neighbors
+from functions import find_neighbors, search_song_data
 
 
 DB = SQLAlchemy()
@@ -31,16 +31,26 @@ class Spotify(DB.Model):
 def create_app():
     """Instantiate the Flask database."""
     app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///deep_spot.sqlite3"
-    DB.init_app(app)
+
 
     @app.route("/", methods=['GET', 'POST'])
     def base():
         """Base view. Asks user to input track to get recommendations"""
         if request.method == 'POST':
-            return results(search)
+            # Get songs from user
+            search_song = request.form['search_song']
+            # Get ID, name, artist, url for search_song in dict form
+            input_track = search_song_data(search_song)
+            # Get recommended songs
+            output_tracks = find_neighbors(search_song)
+            # Sends the above dict to deep_results.html
+            return render_template('deep_results.html', input_track=input_track, output_tracks=output_tracks)
+
 
         return render_template('deep_landing.html')
+
+
+
 
 
     @app.route('/reset')
@@ -53,7 +63,7 @@ def create_app():
     @app.route('/data', methods=['GET', 'POST'])
     def data():
         """Create a page view with all data from the original dataset"""
-        df = pd.read_csv('\\Modelling\\Data\\new_songs_cleaned.csv')
+        df = pd.read_csv('C:\\Users\\mattr\\Repositories\\Unit3BuildWeek\\Modelling\\Data\\new_songs_cleaned.csv')
         result = df.to_json(orient="index")
         parsed = json.loads(result)
         return json.dumps(parsed, indent=4)
@@ -62,10 +72,12 @@ def create_app():
     def prediction_results():
         """Results page view showing predictions"""
         results = find_neighbors(prediction_results)
-        return results
+        if request.method == 'POST':
+            return render_template('deep_results.html', results=results)
+        return render_template('deep_results.html')
 
     return app
 
 
 if __name__ == '__main__':
-    create_app().run()
+    create_app().run(port=1000)

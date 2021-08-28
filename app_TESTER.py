@@ -15,6 +15,7 @@ def create_app():
             search_song = request.form['search_song']
             # GETS ID, NAME, ARTIST, URL FOR SEARCH SONG IN DICTIONARY FORM
             input_track = search_song_data(search_song)
+
             # SENDS THE ABOVE DICTIONARY TO DEEP_RESULTS_TESTER.HTML
             return render_template('deep_results_TESTER.html', input_track=input_track)
 
