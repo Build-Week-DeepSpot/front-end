@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block content %}
-<h1 style="color:white">{% block title %} Predict similar songs given a song input {% endblock %}</h1>
-    <h3 style="color:white"> Enter song name or see random song: </h3>
+<h1 style="color:white">{% block title %} Get songs you love from songs you love {% endblock %}</h1>
+    <h3 style="color:white"> Enter song name: </h3>
 <form method="post">
     <div class="form-group">
         <input type="text" name="search_song"
@@ -15,7 +15,6 @@
     </div>
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Submit</button>
-        <button type="submit" class="btn btn-primary">Random</button>
     </div>
 </form>
 {% endblock %}
